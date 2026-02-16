@@ -11,6 +11,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+const ADMIN_CODE = "Faith2026"; 
 
 /* 1. Story Filtering Logic */
 function filterStories(category) {
@@ -41,14 +42,25 @@ function filterStories(category) {
     });
 }
 
-/* 2. Reading Progress Bar */
+/* 2. Reading Progress Bar & Scroll to Top Visibility */
 window.onscroll = function() {
+    // Progress Bar
     const progressBar = document.getElementById("progress-bar");
     if (progressBar) {
         const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
         const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
         const scrolled = (winScroll / height) * 100;
         progressBar.style.width = scrolled + "%";
+    }
+
+    // Scroll to Top Button
+    const scrollBtn = document.getElementById("scrollToTop");
+    if (scrollBtn) {
+        if (window.pageYOffset > 300) {
+            scrollBtn.style.display = "block";
+        } else {
+            scrollBtn.style.display = "none";
+        }
     }
 };
 
@@ -59,29 +71,25 @@ function sayAmen() {
     const btn = document.querySelector('.amen-btn');
 
     if (storyId && btn && !btn.disabled) {
-        // Reference the specific story's amenCount
         const amenRef = database.ref('stories/' + storyId + '/amenCount');
-
-        // Use a transaction to safely increment the count
         amenRef.transaction((currentCount) => {
             return (currentCount || 0) + 1;
         }).then(() => {
-            // Visual feedback
             btn.innerHTML = "🙏 Amen Recorded";
             btn.style.background = "#b08d57";
             btn.style.color = "white";
-            btn.disabled = true; // Prevent multiple clicks in one session
+            btn.disabled = true; 
         }).catch((error) => {
             console.error("Amen failed: ", error);
         });
     } else if (!storyId) {
-        // Fallback for static/preview pages
         alert("Amen! May this narrative strengthen your faith.");
     }
 }
 
-/* 4. Form Handlers */
+/* 4. Form Handlers (Story Submission & Newsletter) */
 document.addEventListener('submit', function(e) {
+    // Publish Story
     if (e.target.id === 'publishForm') {
         e.preventDefault();
         const author = document.getElementById('author-name').value;
@@ -91,7 +99,8 @@ document.addEventListener('submit', function(e) {
             author: author,
             content: document.getElementById('narrative-content').value,
             image: document.getElementById('image-url').value || 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94',
-            amenCount: 0, // Initialize amens at zero
+            amenCount: 0,
+            approved: true, // Default to true for instant publishing
             timestamp: Date.now()
         };
 
@@ -110,28 +119,64 @@ document.addEventListener('submit', function(e) {
             })
             .catch((error) => alert("Error saving story: " + error.message));
     }
+
+    // Newsletter Signup
+    if (e.target.id === 'newsletterForm') {
+        e.preventDefault();
+        const emailInput = document.getElementById('subscriberEmail');
+        if (emailInput) {
+            database.ref('subscribers').push({
+                email: emailInput.value,
+                signedUpAt: Date.now()
+            }).then(() => {
+                const container = document.querySelector('.newsletter-content');
+                if (container) {
+                    container.innerHTML = `<h2>Welcome to the Community</h2><p>You've successfully joined our mailing list.</p>`;
+                }
+            });
+        }
+    }
 });
 
 /* 5. Initialize Page & Load Firebase Content */
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     
-    if (document.querySelector('.grid-layout')) {
-        loadStoriesFromDB();
+    // Mobile Menu Logic
+    const menuToggle = document.getElementById('mobile-menu');
+    const navLinks = document.querySelector('.nav-links');
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            menuToggle.innerHTML = navLinks.classList.contains('active') ? '✕' : '☰';
+        });
     }
 
-    if (document.getElementById('trending-grid')) {
-        loadTrendingStories();
+    // Scroll to Top Logic
+    const scrollBtn = document.getElementById("scrollToTop");
+    if (scrollBtn) {
+        scrollBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     }
 
-    if (document.querySelector('.story-content')) {
-        loadSingleStory();
+    // Admin Session Check
+    if (document.querySelector('.admin-page')) {
+        if (sessionStorage.getItem('isAdmin') === 'true') {
+            const overlay = document.getElementById('admin-login-overlay');
+            const content = document.getElementById('dashboard-content');
+            if(overlay) overlay.style.display = "none";
+            if(content) content.style.display = "block";
+            loadAdminDashboard();
+        }
     }
+
+    if (document.querySelector('.grid-layout')) loadStoriesFromDB();
+    if (document.getElementById('trending-grid')) loadTrendingStories();
+    if (document.querySelector('.story-content')) loadSingleStory();
 
     const activeFilter = urlParams.get('filter');
-    if (activeFilter) {
-        setTimeout(() => filterStories(activeFilter), 800);
-    }
+    if (activeFilter) setTimeout(() => filterStories(activeFilter), 800);
 
     // Dark Mode Logic
     const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
@@ -168,7 +213,7 @@ function searchStories() {
     });
 }
 
-/* 7. Firebase Data Fetchers */
+/* 7. Firebase Data Fetchers (Public) */
 
 function loadStoriesFromDB() {
     const grid = document.querySelector('.grid-layout');
@@ -176,11 +221,13 @@ function loadStoriesFromDB() {
         grid.innerHTML = "";
         const data = snapshot.val();
         if (!data) {
-            grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center;'>No narratives found in the library yet.</p>";
+            grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center;'>No narratives found.</p>";
             return;
         }
         const entries = Object.entries(data).reverse();
         entries.forEach(([id, story]) => {
+            if (story.approved === false) return; // Moderation Filter
+            
             const amens = story.amenCount || 0;
             grid.innerHTML += `
                 <article class="story-card" data-category="${story.category}">
@@ -207,7 +254,6 @@ function loadSingleStory() {
     const storyId = urlParams.get('id');
 
     if (storyId) {
-        // Use .on instead of .once so the Amen count updates in real-time on the page!
         database.ref('stories/' + storyId).on('value', (snapshot) => {
             const story = snapshot.val();
             if (story) {
@@ -227,7 +273,6 @@ function loadSingleStory() {
                 if(contentDiv) {
                     const firstLetter = story.content.charAt(0);
                     const remainingText = story.content.slice(1);
-                    // Standard text formatting for paragraphs
                     contentDiv.innerHTML = `<p><span class="drop-cap">${firstLetter}</span>${remainingText.replace(/\n/g, '<br><br>')}</p>`;
                 }
                 document.title = `${story.title} | Godly Stories`;
@@ -238,19 +283,15 @@ function loadSingleStory() {
 
 function loadTrendingStories() {
     const trendingGrid = document.getElementById('trending-grid');
-    
-    // Fetch top 3 stories based on amenCount
     database.ref('stories').orderByChild('amenCount').limitToLast(3).on('value', (snapshot) => {
         if (!trendingGrid) return;
         trendingGrid.innerHTML = "";
-        
         const data = snapshot.val();
         if (!data) return;
 
-        // Convert to array and reverse (since limitToLast gives ascending order)
         const entries = Object.entries(data).reverse();
-
         entries.forEach(([id, story]) => {
+            if (story.approved === false) return; // Moderation Filter
             trendingGrid.innerHTML += `
                 <article class="story-card trending-card">
                     <div class="card-image" style="background-image: url('${story.image}')"></div>
@@ -268,4 +309,75 @@ function loadTrendingStories() {
                 </article>`;
         });
     });
+}
+
+/* 8. MASTER ADMIN FUNCTIONS */
+function checkAdminPassword() {
+    const entered = document.getElementById('adminPassword').value;
+    if (entered === ADMIN_CODE) {
+        document.getElementById('admin-login-overlay').style.display = "none";
+        document.getElementById('dashboard-content').style.display = "block";
+        sessionStorage.setItem('isAdmin', 'true');
+        loadAdminDashboard();
+    } else {
+        document.getElementById('login-error').style.display = "block";
+    }
+}
+
+function loadAdminDashboard() {
+    // Admin Story List
+    database.ref('stories').on('value', (snapshot) => {
+        const list = document.getElementById('admin-story-list');
+        const countDisplay = document.getElementById('total-stories-count');
+        if (!list) return;
+        list.innerHTML = "";
+        const data = snapshot.val();
+        if (data) {
+            const entries = Object.entries(data).reverse();
+            if(countDisplay) countDisplay.innerText = entries.length;
+            entries.forEach(([id, story]) => {
+                const isApproved = story.approved !== false;
+                list.innerHTML += `
+                    <tr>
+                        <td><span class="status-dot ${isApproved ? 'active' : 'pending'}"></span></td>
+                        <td><strong>${story.title}</strong></td>
+                        <td>${story.author}</td>
+                        <td>🙏 ${story.amenCount || 0}</td>
+                        <td>
+                            <button class="btn-action" onclick="toggleApproval('${id}', ${isApproved})">${isApproved ? 'Hide' : 'Approve'}</button>
+                            <button class="btn-delete" onclick="deleteStory('${id}')">Delete</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+    });
+
+    // Admin Subscriber List
+    database.ref('subscribers').on('value', (snapshot) => {
+        const list = document.getElementById('admin-sub-list');
+        const countDisplay = document.getElementById('total-subs-count');
+        if (!list) return;
+        list.innerHTML = "";
+        const data = snapshot.val();
+        if (data) {
+            const entries = Object.values(data).reverse();
+            if(countDisplay) countDisplay.innerText = entries.length;
+            entries.forEach(sub => {
+                list.innerHTML += `<div class="sub-card"><strong>${sub.email}</strong><br><small>${new Date(sub.signedUpAt).toLocaleDateString()}</small></div>`;
+            });
+        }
+    });
+}
+
+function toggleApproval(id, currentStatus) {
+    database.ref('stories/' + id).update({ approved: !currentStatus });
+}
+
+function deleteStory(id) {
+    if (confirm("Permanently delete this narrative?")) database.ref('stories/' + id).remove();
+}
+
+function logoutAdmin() {
+    sessionStorage.removeItem('isAdmin');
+    window.location.reload();
 }
