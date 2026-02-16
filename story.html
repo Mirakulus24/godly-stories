@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Narrative | Godly Stories</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body class="reading-page">
+
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">Godly Stories</a>
+        <div class="nav-links">
+            <a href="index.html">← Back to Library</a>
+        </div>
+    </nav>
+
+    <main class="story-wrapper">
+        <header class="story-header">
+            <span class="tag">Loading...</span>
+            <h1>Connecting to Library...</h1>
+            <div class="story-meta-detailed">
+                <img src="https://ui-avatars.com/api/?name=User&background=b08d57&color=fff" alt="Author" class="author-img">
+                <div class="meta-info">
+                    <span class="author-name">Authored by ...</span>
+                    <span class="publish-date">Divine Narrative</span>
+                </div>
+            </div>
+        </header>
+
+        <figure class="main-story-image">
+            <img src="" alt="Story Visual">
+        </figure>
+
+        <article class="story-content">
+            <p>Gathering the words of this journey...</p>
+        </article>
+
+        <footer class="story-actions">
+            <button class="amen-btn" onclick="sayAmen()">
+              <span class="icon">🙏</span> Say Amen
+            </button>
+            <span id="total-amens" style="margin-left: 15px; font-weight: 600; color: #b08d57;"></span>
+            <div class="share-tools">
+               <span>Share this narrative:</span>
+               <a href="#" onclick="window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(window.location.href))">WhatsApp</a>
+               <a href="#" onclick="window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(window.location.href))">Twitter</a>
+           </div>
+        </footer>
+    </main>
+
+    <div class="modal-overlay" id="amenModal">
+    <div class="invite-modal">
+        <div style="font-size: 3rem; margin-bottom: 15px;">✍️</div>
+            <h2>Your Story Matters Too</h2>
+            <p>Your "Amen" shows that narratives have power. Do you have a moment of grace or provision you'd like to share with the world?</p>
+            <div class="modal-btns">
+            <a href="submit.html" class="btn-primary" style="background: #b08d57; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Share My Story</a>
+            <button onclick="closeModal()" style="background: none; border: 1px solid #ccc; padding: 10px 20px; cursor: pointer; border-radius: 5px;">Maybe Later</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Admin | Godly Stories</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body class="admin-page">
+
+    <div id="admin-login-overlay">
+        <div class="login-box">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🛡️</div>
+            <h2>Admin Gate</h2>
+            <input type="password" id="adminPassword" placeholder="Enter Security Code" onkeypress="if(event.key === 'Enter') checkAdminPassword()">
+            <button onclick="checkAdminPassword()" class="btn-primary" style="width: 100%;">Unlock Dashboard</button>
+            <p id="login-error" style="color: #e74c3c; display: none; margin-top: 15px;">Access Denied</p>
+        </div>
+    </div>
+
+    <div id="dashboard-content" style="display: none;">
+        <nav class="navbar">
+            <div class="logo">Godly Admin</div>
+            <div class="nav-links">
+                <a href="index.html">← Back to Site</a>
+                <button onclick="logoutAdmin()" class="btn-outline">Logout</button>
+            </div>
+        </nav>
+
+        <div class="container admin-container">
+            <header class="admin-header">
+                <h1>Library Command Center</h1>
+                <div class="admin-tabs">
+                    <button class="tab-btn active" onclick="switchTab('stories')">Narratives</button>
+                    <button class="tab-btn" onclick="switchTab('subs')">Subscribers</button>
+                </div>
+            </header>
+
+            <section id="tab-stories" class="tab-content active">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Amens</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-story-list"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="tab-subs" class="tab-content">
+                <div class="sub-card-grid" id="admin-sub-list"></div>
+            </section>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

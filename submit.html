@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publish Your Narrative | Godly Stories</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">Godly Stories</a>
+        <div class="nav-links">
+            <a href="index.html">Library</a>
+            <a href="guidelines.html">Guidelines</a>
+        </div>
+    </nav>
+
+    <main class="submit-wrapper">
+        <header class="submit-header">
+            <h1>Share Your Journey</h1>
+            <p>Every miracle has a reader. Every journey has a purpose. Document your narrative below to inspire the global community.</p>
+        </header>
+
+        <section class="form-container">
+            <form id="publishForm">
+                <div class="form-section">
+                    <label for="story-title">Title of the Narrative</label>
+                    <input type="text" id="story-title" placeholder="Give your story a meaningful name..." required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-section">
+                        <label for="category">Category</label>
+                        <select id="category" required>
+                            <option value="" disabled selected>Select a theme</option>
+                            <option value="Healing">Healing</option>
+                            <option value="Provision">Provision</option>
+                            <option value="Peace">Peace</option>
+                            <option value="Restoration">Restoration</option>
+                        </select>
+                    </div>
+                    <div class="form-section">
+                        <label for="author-name">Author Name (or Alias)</label>
+                        <input type="text" id="author-name" placeholder="How should you be credited?" required>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <label for="narrative-content">The Narrative</label>
+                    <textarea id="narrative-content" rows="15" placeholder="Begin writing your story here. Take your time..." required></textarea>
+                    <small>Tip: Focus on the journey and the divine intervention you experienced.</small>
+                </div>
+
+                <div class="form-section">
+                    <label for="image-url">Cover Image URL (Optional)</label>
+                    <input type="url" id="image-url" placeholder="Link to a peaceful landscape or related image...">
+                </div>
+
+                <div class="submit-actions">
+                    <button type="submit" class="btn-publish-final">Publish to Library</button>
+                    <p class="privacy-note">By publishing, you agree to share this story for the encouragement of others.</p>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Godly Stories | A Library of Divine Narratives</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Godly Stories</div>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider round">
+                    <span class="icon-sun"></span>
+                    <span class="icon-moon"></span>
+                </div>
+            </label>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Library</a></li>
+            <li><a href="categories.html">Categories</a></li>
+            <li><a href="mission.html">Our Mission</a></li>
+            <li><a href="submit.html" class="btn-submit">Publish a Story</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Where Every Narrative Matters.</h1>
+            <p>Explore a collection of stories documenting faith, grace, and the extraordinary.</p>
+            <a href="#library" class="btn-primary">Browse Library</a>
+        </div>
+    </header>
+
+    <section class="filter-section">
+       <div class="container">
+          <div class="search-container">
+            <input type="text" id="storySearch" placeholder="Search by title, author, or keyword..." onkeyup="searchStories()">
+            <span class="search-icon">🔍</span>
+          </div>
+
+          <div class="filter-chips">
+            <button class="chip active" onclick="filterStories('all')">All Narratives</button>
+            <button class="chip" onclick="filterStories('Healing')">Healing</button>
+            <button class="chip" onclick="filterStories('Provision')">Provision</button>
+            <button class="chip" onclick="filterStories('Peace')">Peace</button>
+            <button class="chip" onclick="filterStories('Restoration')">Restoration</button>
+         </div>
+       </div>
+   </section>
+
+   <section class="trending-section">
+      <div class="container">
+          <h2 class="section-title">🔥 Most Resonated Narratives</h2>
+          <div id="trending-grid" class="grid-layout"></div>
+      </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <section class="stories-grid-section" id="library">
+        <div class="container grid-layout">
+            <div style="text-align: center; grid-column: 1/-1; padding: 60px 20px;">
+                <p style="color: #7f8c8d; font-style: italic;">Loading the divine library...</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="newsletter-footer">
+       <div class="container newsletter-content">
+           <h2>Weekly Grace in Your Inbox</h2>
+           <p>Join our community to receive a curated collection of the most powerful narratives every Sunday morning.</p>
+           <form id="newsletterForm" class="newsletter-form">
+           <input type="email" id="subscriberEmail" placeholder="Enter your email address" required>
+           <button type="submit" class="btn-newsletter">Join Library</button>
+           </form>
+       </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container footer-grid">
+            <div class="footer-about">
+                <h3 class="logo">Godly Stories</h3>
+                <p>A digital platform dedicated to preserving and sharing the profound narratives of God's work in modern lives.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Browse</h4>
+                <ul>
+                    <li><a href="#">New Releases</a></li>
+                    <li><a href="#">Most Read</a></li>
+                    <li><a href="#">Author Guidelines</a></li>
+                </ul>
+            </div>
+            <div class="footer-action">
+                <h4>Become an Author</h4>
+                <p>Every journey has a reader. Share your narrative to inspire our global community.</p>
+                <a href="submit.html" class="btn-outline">Publish Your Story</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Godly Stories. "Overcoming by the word of their testimony."</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
